@@ -8,22 +8,19 @@ from keepalive import keep_alive #importing an html client
 from dotenv import load_dotenv
 import allphrase
 from allphrase import *
+from greetings import greetings
 
 client = discord.Client()
 
 #making sure that the bot responds
 if "responding" not in db.keys():
   db["responding"] = True
-
 #function to collect quotes from external api
 def find_quote():
   response = requests.get("https://zenquotes.io/api/random")
   json_data = json.loads(response.text)
   quote = json_data[0]['q'] + " -" + json_data[0]['a']
   return(quote)
-
-
-
 #function to enable users to add cheering words
 def update_encouragements(encouraging_message):
   if "encouragements" in db.keys():
@@ -32,7 +29,6 @@ def update_encouragements(encouraging_message):
     db["encouragements"] = encouragements
   else:
     db["encouragements"] = [encouraging_message]
-
 #function to enable users to delete cheering words
 def delete_encouragment(index):
   encouragements = db["encouragements"]
@@ -64,22 +60,15 @@ async def on_message(message):
   if 'suggest me an anime to watch' in message.content.lower():
     response = random.choice(anime_search)
     await message.channel.send(response+' {0.author.mention}'.format(message))
-  if 'latest news' in message.content.lower():
-    response =  NewsFromBBC()  
-    await message.channel.send(response)
-  
-
 
   if 'happy birthday' in message.content.lower():
     await message.channel.send('Happy Birthday! 🎈🎉')
   if 'christmas' in message.content.lower():
     await message.channel.send('Happy Christmas! 🎈🎉')
-  if  msg.startswith('hi'):
-    k = 'Hi {0.author.mention}'.format(message)
-    await message.channel.send(k)
-  if 'hello' in message.content.lower():
-    k = 'Hi {0.author.mention}'.format(message)
-    await message.channel.send(k)
+  if any(word in msg for word in greetings):
+    response = random.choice(greetings)
+    await message.channel.send(response  + '{0.author.mention}'.format(message))
+
   if 'how are you?' in message.content.lower():
     k = 'Fine. What about you? {0.author.mention}'.format(message)
     await message.channel.send(k)  
